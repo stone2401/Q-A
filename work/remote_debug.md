@@ -15,6 +15,7 @@
 5.	启动调试：VSCode 连接到 Delve 服务，即可进行远程调试。
 
 适用于以下场景：
+
 •	`本地或远程服务器上的 Go 程序。`
 
 •	`容器（Docker）中运行的 Go 程序。`
@@ -43,27 +44,43 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -gcflags="all=-N -l" -o myapp
 ```
 解释：
 `CGO_ENABLED=0`
-	•	禁用 CGO（C语言扩展）。
-	•	CGO 是 Go 中与 C 语言交互的功能模块，当你需要完全静态编译的二进制文件（不依赖系统的动态库）时，通常将其禁用。
-	•	设置为 0 表示禁用，生成的程序不依赖任何动态链接库，可以更方便地在其他环境中运行。
+
+•	禁用 CGO（C语言扩展）。
+
+•	CGO 是 Go 中与 C 语言交互的功能模块，当你需要完全静态编译的二进制文件（不依赖系统的动态库）时，通常将其禁用。
+
+•	设置为 0 表示禁用，生成的程序不依赖任何动态链接库，可以更方便地在其他环境中运行。
+
 `GOOS=linux`
-	•	指定目标操作系统为 Linux。
-	•	Go 支持交叉编译，这里的 GOOS 表示目标程序将在 Linux 操作系统上运行，无论你当前的开发环境是 Windows、Mac 还是其他系统。
+
+•	指定目标操作系统为 Linux。
+
+•	Go 支持交叉编译，这里的 GOOS 表示目标程序将在 Linux 操作系统上运行，无论你当前的开发环境是 Windows、Mac 还是其他系统。
+
 `GOARCH=arm64`
-	•	指定目标架构为 ARM64。
-	•	GOARCH 是目标 CPU 架构，此处表示程序将运行在 64 位 ARM 处理器上，例如 Raspberry Pi、云服务器上的 ARM 实例等。
+
+•	指定目标架构为 ARM64。
+
+•	GOARCH 是目标 CPU 架构，此处表示程序将运行在 64 位 ARM 处理器上，例如 Raspberry Pi、云服务器上的 ARM 实例等。
+
 `-gcflags="all=-N -l"`
-	•	用于调整 Go 编译器的行为，主要影响优化设置：
-	•	-N：关闭优化，使代码结构尽量保留原样，便于调试。
-	•	-l：关闭内联优化（inlining），防止函数被内联，从而保留完整的函数调用栈信息，便于断点和回溯分析。
-	•	all= 表示应用于所有包（包括标准库和用户定义的包）。
+
+•	用于调整 Go 编译器的行为，主要影响优化设置：
+
+•	-N：关闭优化，使代码结构尽量保留原样，便于调试。
+
+•	-l：关闭内联优化（inlining），防止函数被内联，从而保留完整的函数调用栈信息，便于断点和回溯分析。
+
+•	all= 表示应用于所有包（包括标准库和用户定义的包）。
 
 
 运行程序
 
 启动你的 Go 程序，可以选择前台、后台运行，或通过 Docker 启动：
-	•	如果在本地运行，使用 ./myapp 启动。
-	•	如果在 Docker 中运行，请确保容器启动后可以找到其进程 ID（docker启动容器需要在寻找宿主机中寻找启动进程PID）。
+
+•	如果在本地运行，使用 ./myapp 启动。
+
+•	如果在 Docker 中运行，请确保容器启动后可以找到其进程 ID（docker启动容器需要在寻找宿主机中寻找启动进程PID）。
 
 查找进程 ID
 
@@ -82,20 +99,31 @@ ps -ef | grep myapp
 dlv attach $(docker inspect -f '{{.State.Pid}}' <container_name>) --headless --api-version=2 --log --listen=:2345
 ```
 参数说明
-	1.	attach <PID>
+
+1.	attach <PID>
+
 指定要调试的目标进程，PID 是目标进程的进程 ID。Delve 会连接到正在运行的 Go 程序，无需重启程序。
-	2.	--headless
+
+2.	--headless
+
 表示以无交互模式运行 Delve，适合远程调试场景。调试器不会启动交互式 CLI，而是等待来自客户端（如 VSCode）的连接。
-	3.	--api-version=2
+
+3.	--api-version=2
+
 使用 API v2，这一版本功能更强大，通常与 VSCode 的调试插件兼容。
-	4.	--log
+
+4.	--log
+
 启用日志输出，便于分析调试器的问题。
-	5.	--listen=:2345
+
+5.	--listen=:2345
+
 指定监听地址和端口（如 :2345 表示监听所有本地 IP 地址上的 2345 端口）。客户端调试工具（如 VSCode）通过这个端口连接到 Delve。
 
 ### 4. 配置 VSCode
 
 在 VSCode 中打开你的代码目录，在项目根目录下创建 .vscode/launch.json 文件，内容如下：
+
 ```bash
 {
     "version": "0.2.0",
@@ -110,6 +138,7 @@ dlv attach $(docker inspect -f '{{.State.Pid}}' <container_name>) --headless --a
         }
     ]
 }
+
 ```
 配置说明
 	•	name：调试配置名称，可以自定义。
@@ -122,9 +151,12 @@ dlv attach $(docker inspect -f '{{.State.Pid}}' <container_name>) --headless --a
 ### 5. 启动调试
 
 完成配置后：
-	1.	在 VSCode 调试面板中选择 `Remote Attach`（右侧运行于调试 or F5） 配置。
-	2.	点击启动调试（绿色三角按钮）。
-	3.	调试器连接成功后，可以在 VSCode 中设置断点、查看变量、单步调试等。
+
+1.	在 VSCode 调试面板中选择 `Remote Attach`（右侧运行于调试 or F5） 配置。
+
+2.	点击启动调试（绿色三角按钮）。
+
+3.	调试器连接成功后，可以在 VSCode 中设置断点、查看变量、单步调试等。
 
 看到如下dlv输出表示已经成功启动，并连接到vscode断点
 ![dlv输出效果图](../.image/debug_dlv.png)
