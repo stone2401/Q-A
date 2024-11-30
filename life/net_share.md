@@ -5,14 +5,10 @@
 最近，随着 fnos（一款 NAS 系统）火热推广，我决定利用家中闲置的旧电脑来搭建 NAS。然而，问题随之而来：出租屋里只有一个网口，NAS 使用了这个网口，我的主力电脑却无法上网！幸运的是，这台旧电脑配备了两个网口，正好可以用来实现网络共享。
 
 设备清单：
-
-•	一台双网口的 Linux 电脑（NAS）
-
-•	一台单网口的 Windows 主机
-
-•	一个连接外网的有线网络
-
-•	两根网线
+-	一台双网口的 Linux 电脑（NAS）
+-	一台单网口的 Windows 主机
+-	一个连接外网的有线网络
+-	两根网线
 
 接下来，我们就一步步实现如何通过 Linux 双网口设备共享网络，让 Windows 主机也能顺畅上网。
 注：`思路通用，不同系统版本查找对应工具链操作即可`
@@ -28,10 +24,8 @@
 nmcli device status
 ```
 假设：
-
-•	eth0 连接外网（路由器）
-
-•	eth1 连接内网的 Windows 主机
+-	eth0 连接外网（路由器）
+-	eth1 连接内网的 Windows 主机
 
 ---
 
@@ -43,14 +37,10 @@ nmcli con add type ethernet con-name internal ifname eth1 ip4 192.168.1.1/24
 nmcli con up internal
 ```
 命令解释：
-
-•	nmcli con add：添加一个新的网络连接。
-
-•	type ethernet：设置连接类型为以太网。
-
-•	ifname eth1：指定网卡接口为 eth1。
-
-•	ip4 192.168.1.1/24：分配静态 IP 地址和子网掩码。
+-	nmcli con add：添加一个新的网络连接。
+-	type ethernet：设置连接类型为以太网。
+-	ifname eth1：指定网卡接口为 eth1。
+-	ip4 192.168.1.1/24：分配静态 IP 地址和子网掩码。
 
 注意：如果你的外部路由器使用的网关地址是 192.168.1.1，需要将内网 IP 设置为其他网段，例如 192.168.2.1/24，避免冲突。
 
@@ -80,14 +70,10 @@ sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 
 命令解释：
-
-•	-t nat：指定使用 NAT 表。
-
-•	POSTROUTING：表示在数据包离开时修改其源 IP。
-
-•	-o eth0：指定外网接口为 eth0。
-
-•	MASQUERADE：动态隐藏源 IP，让数据包看起来是从 Linux 的外网接口发出的。
+-	-t nat：指定使用 NAT 表。
+-	POSTROUTING：表示在数据包离开时修改其源 IP。
+-	-o eth0：指定外网接口为 eth0。
+-	MASQUERADE：动态隐藏源 IP，让数据包看起来是从 Linux 的外网接口发出的。
 
 ---
 
@@ -111,13 +97,10 @@ sudo netfilter-persistent save
 
 3.	双击 Internet 协议版本 4 (TCP/IPv4)，手动配置以下信息：
 
-•	IP 地址：192.168.1.2（或与 Linux 内网地址相同网段的其他地址）
-
-•	子网掩码：255.255.255.0
-
-•	默认网关：192.168.1.1（Linux 的内网接口 IP）
-
-•	DNS 服务器：8.8.8.8（Google 公共 DNS）或外网路由器的 DNS 地址
+-	IP 地址：192.168.1.2（或与 Linux 内网地址相同网段的其他地址）
+-	子网掩码：255.255.255.0
+-	默认网关：192.168.1.1（Linux 的内网接口 IP）
+-	DNS 服务器：8.8.8.8（Google 公共 DNS）或外网路由器的 DNS 地址
 
 ---
 
