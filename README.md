@@ -3,7 +3,7 @@
 
 ## 目录
 ### 工作相关
-[Golang 服务器调试-远程调试（vscode）](work/远程调试.md)
+[Golang 服务器调试-远程调试（vscode）](work/remote_debug.md)
 
 
 ### 生活
